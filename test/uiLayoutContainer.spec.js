@@ -5,7 +5,7 @@ describe('Directive: uiLayoutContainer', function () {
   var scope, element, $compile,
     template = function(params) {
       return '' +
-      '<div ui-layout="{flow: \'column\'}" ui-layout-loaded ' + (params.animate || '') + '>' +
+      '<div ui-layout="{flow: \'column\' ' + (params.animate || '') + '}" ui-layout-loaded>' +
       '  <div ui-layout-container collapsed="layout.beforeContainer" size="100px" min-size="50px"  max-size="200px" resizable="false">One</div>' +
       '  <div ui-layout-container data-collapsed="layout.afterContainer">Two</div>' +
       '</div>';
@@ -64,7 +64,7 @@ describe('Directive: uiLayoutContainer', function () {
   });
 
   it('should be animated when the attribute is explicitly set', function() {
-    element = createDirective({ beforeContainer: true, afterContainer: false, animate: 'animate="true"'});
+    element = createDirective({ beforeContainer: true, afterContainer: false, animate: ', disableAnimation: false'});
     var divs = element.find('div'),
       beforeContainer = divs[0],
       afterContainer = divs[2];
@@ -83,7 +83,7 @@ describe('Directive: uiLayoutContainer', function () {
   });
 
   it('should not be animated when the attribute is set to false', function() {
-    element = createDirective({ beforeContainer: true, afterContainer: false, animate: 'animate="false"'});
+    element = createDirective({ beforeContainer: true, afterContainer: false, animate: ', disableAnimation: true'});
     var divs = element.find('div'),
       beforeContainer = divs[0],
       afterContainer = divs[2];

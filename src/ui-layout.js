@@ -19,8 +19,6 @@ angular.module('ui.layout', [])
 
     Layout.addLayout(ctrl);
 
-    ctrl.animate = $attrs.animate;
-
     ctrl.containers = [];
     ctrl.movingSplitbar = null;
     ctrl.bounds = $element[0].getBoundingClientRect();
@@ -61,6 +59,7 @@ angular.module('ui.layout', [])
     opts.minSizes = opts.minSizes || [];
     opts.dividerSize = opts.dividerSize === undefined ? 10 : opts.dividerSize;
     opts.collapsed = opts.collapsed || [];
+    opts.disableAnimations = opts.disableAnimations || false;
     ctrl.opts = opts;
 
     $scope.updateDisplay = function() {
@@ -682,7 +681,7 @@ angular.module('ui.layout', [])
         if(!element.hasClass('stretch')) element.addClass('stretch');
         if(!element.hasClass('ui-splitbar')) element.addClass('ui-splitbar');
 
-        if (ctrl.animate !== 'false') {
+        if (!ctrl.opts.disableAnimation) {
           var animationClass = ctrl.isUsingColumnFlow ? 'animate-column' : 'animate-row';
           element.addClass(animationClass);
         }
@@ -929,7 +928,7 @@ angular.module('ui.layout', [])
                 if(!element.hasClass('stretch')) element.addClass('stretch');
                 if(!element.hasClass('ui-layout-container')) element.addClass('ui-layout-container');
 
-                if (ctrl.animate !== 'false') {
+                if (!ctrl.opts.disableAnimation) {
                   var animationClass = ctrl.isUsingColumnFlow ? 'animate-column' : 'animate-row';
                   element.addClass(animationClass);
                 }
