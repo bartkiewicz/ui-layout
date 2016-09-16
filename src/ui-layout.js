@@ -59,6 +59,7 @@ angular.module('ui.layout', [])
     opts.minSizes = opts.minSizes || [];
     opts.dividerSize = opts.dividerSize === undefined ? 10 : opts.dividerSize;
     opts.collapsed = opts.collapsed || [];
+    opts.disableAnimations = opts.disableAnimations || false;
     ctrl.opts = opts;
 
     $scope.updateDisplay = function() {
@@ -680,8 +681,10 @@ angular.module('ui.layout', [])
         if(!element.hasClass('stretch')) element.addClass('stretch');
         if(!element.hasClass('ui-splitbar')) element.addClass('ui-splitbar');
 
-        var animationClass = ctrl.isUsingColumnFlow ? 'animate-column' : 'animate-row';
-        element.addClass(animationClass);
+        if (!ctrl.opts.disableAnimation) {
+          var animationClass = ctrl.isUsingColumnFlow ? 'animate-column' : 'animate-row';
+          element.addClass(animationClass);
+        }
 
         scope.splitbar = LayoutContainer.Splitbar();
         scope.splitbar.element = element;
@@ -828,22 +831,29 @@ angular.module('ui.layout', [])
         });
 
         element.on('mousedown touchstart', function(e) {
-          ctrl.movingSplitbar = scope.splitbar;
-          ctrl.processSplitbar(scope.splitbar);
+          if (e.button === 0 || e.type === 'touchstart') {
+            // only trigger when left mouse button is pressed:
+            ctrl.movingSplitbar = scope.splitbar;
+            ctrl.processSplitbar(scope.splitbar);
 
-          e.preventDefault();
-          e.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation();
 
-          htmlElement.on('mousemove touchmove', function(event) {
-            scope.$apply(angular.bind(ctrl, ctrl.mouseMoveHandler, event));
-          });
-          return false;
+            htmlElement.on('mousemove touchmove', handleMouseMove);
+            return false;
+          }
         });
 
-        htmlElement.on('mouseup touchend', function(event) {
+        function handleMouseMove(event) {
+          scope.$apply(angular.bind(ctrl, ctrl.mouseMoveHandler, event));
+        }
+
+        function handleMouseUp(event) {
           scope.$apply(angular.bind(ctrl, ctrl.mouseUpHandler, event));
-          htmlElement.off('mousemove touchmove');
-        });
+          htmlElement.off('mousemove touchmove', handleMouseMove);
+        }
+
+        htmlElement.on('mouseup touchend', handleMouseUp);
 
         scope.$watch('splitbar.size', function(newValue) {
           element.css(ctrl.sizeProperties.sizeProperty, newValue + 'px');
@@ -853,15 +863,13 @@ angular.module('ui.layout', [])
           element.css(ctrl.sizeProperties.flowProperty, newValue + 'px');
         });
 
-        scope.$on('$destroy', function() {
-          htmlElement.off('mouseup touchend mousemove touchmove');
-        });
-
         //Add splitbar to layout container list
         ctrl.addContainer(scope.splitbar);
 
         element.on('$destroy', function() {
           ctrl.removeContainer(scope.splitbar);
+          htmlElement.off('mouseup touchend', handleMouseUp);
+          htmlElement.off('mousemove touchmove', handleMouseMove);
           scope.$evalAsync();
         });
       }
@@ -920,8 +928,10 @@ angular.module('ui.layout', [])
                 if(!element.hasClass('stretch')) element.addClass('stretch');
                 if(!element.hasClass('ui-layout-container')) element.addClass('ui-layout-container');
 
-                var animationClass = ctrl.isUsingColumnFlow ? 'animate-column' : 'animate-row';
-                element.addClass(animationClass);
+                if (!ctrl.opts.disableAnimation) {
+                  var animationClass = ctrl.isUsingColumnFlow ? 'animate-column' : 'animate-row';
+                  element.addClass(animationClass);
+                }
 
                 scope.$watch('collapsed', function (val, old) {
                   if (angular.isDefined(old) && val !== old) {
