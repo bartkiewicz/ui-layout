@@ -59,7 +59,7 @@ angular.module('ui.layout', [])
     opts.minSizes = opts.minSizes || [];
     opts.dividerSize = opts.dividerSize === undefined ? 10 : opts.dividerSize;
     opts.collapsed = opts.collapsed || [];
-    opts.disableAnimations = opts.disableAnimations || false;
+    opts.disableAnimation = opts.disableAnimation || false;
     ctrl.opts = opts;
 
     $scope.updateDisplay = function() {
